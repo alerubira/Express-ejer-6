@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cargar Archivo y Recuperar Palabra</title>
+</head>
+<body>
+  <h1>Cargar Archivo de Texto</h1>
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    <input type="submit" value="Cargar Archivo">
+  </form>
+
+  <div id="wordForm" style="display:none;">
+    <h2>Recuperar Palabra</h2>
+    <label for="lineNumber">Número de Línea:</label>
+    <input type="number" id="lineNumber" required>
+    <label for="wordNumber">Número de Palabra:</label>
+    <input type="number" id="wordNumber" required>
+    <button onclick="getWord()">Recuperar Palabra</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function getWord() {
+      const lineNumber = document.getElementById('lineNumber').value;
+      const wordNumber = document.getElementById('wordNumber').value;
+
+      fetch('/getWord', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ lineNumber, wordNumber }),
+})
+  .then(response => response.json())
+  .then(data => {
+    if (data.error) {
+      console.error(data.message);  // Mostrar mensaje de error del servidor
+      document.getElementById('result').innerHTML = 'Palabra no disponible';
+    } else {
+      document.getElementById('result').innerHTML = `Palabra recuperada: ${data.word}`;
+    }
+  })
+  .catch(error => console.error('Error:', error));
+
+    }
+    document.querySelector('input[type="file"]').addEventListener('change', function () {
+      document.getElementById('wordForm').style.display = 'block';
+    });
+  </script>
+</body>
+</html>
